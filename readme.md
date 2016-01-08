@@ -15,23 +15,8 @@ npm install -g keyword-count
 ```
 
 ## Example
-```javascript
-var keywordCount = require('keyword-count');
 
-var options = {
-	target: 'path/to/myFile.txt',
-	keywordsList: 'path/to/keywords.json',
-	outputPath: 'path/to/results.json'    // Optional
-};
-
-keywordCount(options)
-	.then(function(results) {
-		// results written to path/to/results.json
-		console.log(results);
-	});
-```
-
-**path/to/myFile.txt**
+**File to Analyze** - _path/to/myFile.txt_
 ```
 'In that direction,' the Cat said, waving its right paw round, 'lives a Hatter: and in that direction,' waving the other paw, 'lives a March Hare. Visit either you like: they're both mad.'
 'But I don't want to go among mad people,' Alice remarked.
@@ -40,14 +25,31 @@ keywordCount(options)
 'You must be,' said the Cat, 'or you wouldn't have come here.'
 ```
 
-**path/to/keywords.json**
+**JSON with Keywords** - _path/to/keywords.json_
 ```json
 {
 	"keywords": ["Alice", "Cat", "March Hare", "Hatter", "mad"]
 }
 ```
 
-**path/to/results.json**
+**Usage**
+```javascript
+var keywordCount = require('keyword-count');
+
+var options = {
+    target: 'path/to/myFile.txt',
+    keywordsList: 'path/to/keywords.json', // Can be filename or an array of strings, i.e. ["foo", "bar"]
+    outputPath: 'path/to/results.json'    // Optional
+};
+
+keywordCount(options)
+    .then(function(results) {
+        // results written to path/to/results.json
+        console.log(results);
+    });
+```
+
+**Tada!** New file - _path/to/results.json_
 ```json
 {
 	"myFile": {

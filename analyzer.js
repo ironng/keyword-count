@@ -1,8 +1,5 @@
 'use strict';
 
-var DEFAULT_OUTPUT_PATH = 'target/results.json';
-var DEFAULT_KEY_NAME = 'keywords';
-
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require('fs'));
 var Transform = require('stream').Transform;
@@ -10,9 +7,26 @@ var grep = require('grep1');
 var mkdirp = Promise.promisify(require('mkdirp'));
 var path = require('path');
 var parsePath = require('parse-filepath');
-var titleCase = require('title-case');
 
 
+/**
+ * Default file path that the analyzer results are written to.
+ * @type {String}
+ */
+var DEFAULT_OUTPUT_PATH = 'target/results.json';
+
+/**
+ * Default name of keyword array in keyword json.
+ * @type {String}
+ */
+var DEFAULT_KEY_NAME = 'keywords';
+
+
+/**
+ * Analyzes a directory or file for keywords and writes the results
+ * to a JSON file
+ * @param {Object} opts    Configuration object
+ */
 function Analyzer(opts) {
     opts = opts ? opts : {};
 
@@ -26,7 +40,11 @@ function Analyzer(opts) {
     this.resultsMap = {};
 }
 
-
+/**
+ * Runs the text analysis of the target file against the keywordList to produce
+ * a map of keywords and their respective count
+ * @return {Object}    A promise that resolves with the results map
+ */
 Analyzer.prototype.analyze = function() {
     var self = this;
     var target = self.target;
@@ -52,6 +70,10 @@ Analyzer.prototype.analyze = function() {
         });
 };
 
+/**
+ * Performs a grep for the keywords in all files in a directory
+ * @return {Object}     A promise
+ */
 Analyzer.prototype.grepDir = function() {
     var self = this;
     var grepped = [];
@@ -67,6 +89,11 @@ Analyzer.prototype.grepDir = function() {
         });
 };
 
+/**
+ * Runs a grep on a file for keywords
+ * @param  {String} file    File name
+ * @return {Object}         A promise
+ */
 Analyzer.prototype.grepFile = function(file) {
     var self = this;
     var stringify = self.stringifier();
@@ -98,6 +125,12 @@ Analyzer.prototype.grepFile = function(file) {
     });
 };
 
+/**
+ * Gets the keywords.
+ * Returns a promise that resolves with the keyword array from
+ * parsed json or the provided array if `keywordList` is already an array.
+ * @return {Object}    A promise
+ */
 Analyzer.prototype.getKeywords = function() {
     var keywordsList = this.keywordsList;
     var keyName = this.keyName;
@@ -120,6 +153,10 @@ Analyzer.prototype.getKeywords = function() {
     }
 };
 
+/**
+ * Creates an instance of a Transform stream that transforms data into formatted JSON
+ * @return {Object}    A Transform stream
+ */
 Analyzer.prototype.stringifier = function() {
     var transformer = new Transform({objectMode: true});
     transformer._transform = function(data, encoding, done) {
@@ -132,6 +169,12 @@ Analyzer.prototype.stringifier = function() {
     return transformer;
 };
 
+/**
+ * Creates an instance of a Transform stream that parses through grep results
+ * to create a map of keyword data for a given file
+ * @param  {String} file    File name
+ * @return {Object}         A Transform stream
+ */
 Analyzer.prototype.mapper = function(file) {
     var self = this;
     var transformer = new Transform({objectMode: true});
@@ -168,6 +211,11 @@ Analyzer.prototype.mapper = function(file) {
     return transformer;
 };
 
+/**
+ * Prepares the output path by checking if the entire file path exists,
+ * and creates it if it doesn't
+ * @return {Object}    A promise
+ */
 Analyzer.prototype.prepOutputPath = function() {
     var self = this;
     var dirName = path.dirname(self.outputPath);
@@ -181,6 +229,13 @@ Analyzer.prototype.prepOutputPath = function() {
         });
 };
 
+/**
+ * Gets correct key in a map to match the provided word. If `ignoreCase` is true,
+ * a case-insensitve search for the key is performed.
+ * @param  {String} word         Word to match the key against
+ * @param  {Object} map          Object with keys to inspect
+ * @return {String|undefined}    Matched key or undefined if no match is found
+ */
 Analyzer.prototype.getKey = function(word, map) {
     if (!this.ignoreCase) {
         return word;

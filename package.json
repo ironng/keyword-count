@@ -1,6 +1,6 @@
 {
   "name": "keyword-count",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Get the keyword frequency for a file or directory output as JSON.",
   "main": "index.js",
   "bin": {
@@ -15,6 +15,7 @@
     "json",
     "file"
   ],
+  "repository": "ironng/keyword-count",
   "author": "Erin Ng",
   "license": "MIT",
   "dependencies": {
@@ -22,8 +23,7 @@
     "grep1": "0.0.5",
     "meow": "^3.6.0",
     "mkdirp": "^0.5.1",
-    "parse-filepath": "^0.6.3",
-    "title-case": "^1.1.1"
+    "parse-filepath": "^0.6.3"
   },
   "devDependencies": {
     "chai": "^3.4.1",
